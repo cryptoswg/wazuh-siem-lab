@@ -1,10 +1,10 @@
-# 🛡️ Home SIEM Lab — Wazuh + Suricata на Apple Silicon
+# Home SIEM Lab — Wazuh + Suricata на Apple Silicon
 
 > Портфолио-проект: построение домашней лаборатории SIEM с нуля на ARM64 (Apple Silicon M-series), симуляция реальных атак и их детекция.
 
 ---
 
-## 📋 Содержание
+## Содержание
 
 - [Обзор проекта](#обзор-проекта)
 - [Архитектура](#архитектура)
