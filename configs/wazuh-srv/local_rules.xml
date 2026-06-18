@@ -1,1 +1,16 @@
+<!--
+  Wazuh Manager — local_rules.xml
+  Кастомное правило для детекции запуска netcat (Сценарий C)
+  Путь: /var/ossec/etc/rules/local_rules.xml
+-->
 
+<group name="audit,">
+  <rule id="100001" level="10">
+    <if_sid>80700</if_sid>
+    <match>exe="/usr/bin/nc</match>
+    <description>Suspicious: netcat executed on $(agent.name)</description>
+    <mitre>
+      <id>T1059</id>
+    </mitre>
+  </rule>
+</group>
