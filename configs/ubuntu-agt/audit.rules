@@ -1,1 +1,24 @@
+# Auditd rules — мониторинг выполнения процессов
+# Агент: ubuntu-agt
+# Применяется через: auditctl (см. команды ниже)
+#
+# ВАЖНО (ARM64): правило -w (watch на файл) работает нестабильно
+# на Apple Silicon / aarch64. Используется syscall-based подход
+# через -a always,exit вместо -w для надёжной детекции.
+
+# Мониторинг всех вызовов execve (запуск любого процесса)
+-a always,exit -F arch=b64 -S execve -k process_exec
+
+# Дополнительный мониторинг доступа к критическим файлам
+-w /etc/passwd -p rwxa -k passwd_access
+
+# Применение правил:
+#   sudo auditctl -a always,exit -F arch=b64 -S execve -k process_exec
+#   sudo auditctl -w /etc/passwd -p rwxa -k passwd_access
+#
+# Проверка активных правил:
+#   sudo auditctl -l
+#
+# Поиск событий по ключу:
+#   sudo ausearch -k process_exec -ts recent
 
