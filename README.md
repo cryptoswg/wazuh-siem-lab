@@ -1,10 +1,10 @@
-# Home SIEM Lab — Wazuh + Suricata на Apple Silicon
+# 🛡️ Home SIEM Lab — Wazuh + Suricata на Apple Silicon
 
 > Портфолио-проект: построение домашней лаборатории SIEM с нуля на ARM64 (Apple Silicon M-series), симуляция реальных атак и их детекция.
 
 ---
 
-## Содержание
+## 📋 Содержание
 
 - [Обзор проекта](#обзор-проекта)
 - [Архитектура](#архитектура)
@@ -40,7 +40,6 @@
           ┌────────────┴────────────┐
           │      siem-lab network   │
           │     192.168.212.0/24    │
-
           └──┬──────────┬───────────┘
              │          │           │
     ┌────────┴──┐ ┌─────┴──────┐ ┌─┴──────────┐
@@ -123,11 +122,7 @@ filter {
 
 ## Сценарии атак и детекция
 
-### Сценарий A — Nmap SYN Scan
-**Атака:** Сканирование портов ubuntu-agt с kali-atk  
-**Инструмент:** `nmap -sS 192.168.212.20`  
-**Детекция:** Suricata ET SCAN rules  
-**Результат:** `ET SCAN Possible Nmap User-Agent Observed` (Rule 86601)
+![Все алерты в Wazuh Threat Hunting](screenshots/allrules.jpg)
 
 ---
 
@@ -142,6 +137,8 @@ filter {
 [Kali] hydra → [ubuntu-agt:22] → sshd logs → [Wazuh Agent]
 → [Wazuh Manager] → Rule 5763 (Level 10) → [Dashboard]
 ```
+
+![SSH Brute-force — Rule 5763](screenshots/rule5763.jpg)
 
 ---
 
@@ -166,6 +163,8 @@ filter {
 </group>
 ```
 
+![Netcat detection — Rule 100001](screenshots/rule100001.jpg)
+
 ---
 
 ### Сценарий D — File Integrity Monitoring 🟡
@@ -187,6 +186,8 @@ filter {
   </syscheck>
 </agent_config>
 ```
+
+![FIM — Rule 550](screenshots/rule550.jpg)
 
 ---
 
@@ -220,13 +221,24 @@ $ sudo iptables -L INPUT -n | grep 192.168.212.40
 DROP  all  --  192.168.212.40  0.0.0.0/0
 ```
 
+![Active Response — Rule 651](screenshots/rule651.jpg)
+
+---
+
+### Сценарий E — Suricata Network Detection 🟡
+**Атака:** Агрессивное сканирование портов с kali-atk  
+**Инструмент:** `nmap -A -T4 -sV 192.168.212.20`  
+**Детекция:** Suricata ET SCAN rules  
+**Результат:** `ET SCAN Possible Nmap User-Agent Observed` (Rule 86601)
+
+![Suricata Nmap detection — Rule 86601](screenshots/rule86601.jpg)
+
 ---
 
 ## Ключевые результаты
 
 | # | Сценарий | Инструмент атаки | Rule ID | Level | MITRE |
 |---|----------|-----------------|---------|-------|-------|
-| A | Nmap scan | nmap -A -T4 | 86601 | 3 | T1046 |
 | B | SSH Brute-force | hydra | 5763 | **10** | T1110 |
 | C | Netcat (reverse shell) | nc | 100001 | **10** | T1059 |
 | D | sudoers modification | useradd / echo | 550 | 7 | T1548 |
@@ -255,7 +267,7 @@ DROP  all  --  192.168.212.40  0.0.0.0/0
 
 ```
 wazuh-siem-lab/
-├── README.md                    # этот файл
+├── README.md
 ├── configs/
 │   ├── wazuh-srv/
 │   │   ├── ossec.conf           # конфиг менеджера
@@ -263,14 +275,15 @@ wazuh-siem-lab/
 │   │   └── logstash-wazuh.conf  # pipeline Logstash
 │   └── ubuntu-agt/
 │       ├── ossec.conf           # конфиг агента
-│       └── agent.conf           # shared config (FIM)
+│       ├── agent.conf           # shared config (FIM)
+│       └── audit.rules          # auditd правила
 └── screenshots/
-    ├── 01-dashboard-overview.png
-    ├── 02-ssh-brute-force-rule5763.png
-    ├── 03-active-response-rule651.png
-    ├── 04-netcat-rule100001.png
-    ├── 05-fim-rule550.png
-    └── 06-suricata-nmap.png
+    ├── allrules.jpg
+    ├── rule5763.jpg
+    ├── rule100001.jpg
+    ├── rule550.jpg
+    ├── rule651.jpg
+    └── rule86601.jpg
 ```
 
 ---
